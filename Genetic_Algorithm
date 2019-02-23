@@ -1,0 +1,89 @@
+'''
+This is an incomplete Genetic algorithm code for my project.
+I will finish it later.
+'''
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from csv import reader
+
+N_STATIONS = 10     # DNA size
+CROSS_RATE = 0.1    # mating probability (DNA crossover)
+MUTATE_RATE = 0.02  # mutation probability
+POP_SIZE = 1000     # population size
+N_GENERATIONS = 200
+filename='E:\\python\\EVs\\data.csv'
+
+with open(filename,'rt',encoding='UTF-8')as raw_data:
+    readers = reader(raw_data,delimiter=',')
+    x = list(readers)
+    num = np.array(x)
+    pop = num[1:]   # initialize the pop DNA
+
+#initial charge station position
+def cs_position(n_stations):
+        x1 = np.random.rand(n_stations)*2.05+115.25
+        y1 = np.random.rand(n_stations)*1.77+39.26
+        init_station_position = np.hstack((x1.reshape([n_stations,1]), y1.reshape([n_stations,1])))
+        init_DNA = pd.DataFrame(init_station_position)
+        return init_DNA
+    
+#Function to calculate the minimum distance
+def F(x,DNA): 
+    df = pd.DataFrame(columns = ['distance', 'csnum'])
+    for indexs in DNA.index:
+        x3 = (DNA.iloc[indexs,0]-x[0])**2
+        y3 = (DNA.iloc[indexs,1]-x[1])**2
+        df = df.append([x3 + y3,indexs],ignore_index=True)
+    x2 = df[0].min(axis=1)
+    y2 = df[0].argmin(axis=1)
+    return np.array([x2,y2])     # to find the maximum of this function
+
+
+#fitness is represented by the shortest distance
+def get_fitness(pred): return pred
+
+
+#Convert charging station coordinates to distance and direction
+def translateDNA(pop):
+	np.random.choice(pop)
+	arr = np.array([][])
+	arr.append(F(pop,DNA))
+	#Need to call F() and store the distance and direction in an array
+    return arr
+
+
+def select(pop, fitness):    # nature selection wrt pop's fitness
+    idx = np.random.choice(np.arange(POP_SIZE), size=POP_SIZE, replace=True,
+                           p=fitness/fitness.sum())
+    return pop[idx]
+
+
+def crossover(parent, pop):     # mating process (genes crossover)
+    if np.random.rand() < CROSS_RATE:
+        i_ = np.random.randint(0, POP_SIZE, size=1)                             # select another individual from pop
+        cross_points = np.random.randint(0, 2, size=N_STATIONS).astype(np.bool) # choose crossover points
+        parent[cross_points] = pop[i_, cross_points]                            # mating and produce one child
+    return parent
+
+
+def mutate(child):	#Mutation process
+    for point in range(N_STATIONS):
+        if np.random.rand() < MUTATE_RATE:
+            #A mutation method suitable for the project
+    return child
+
+DNA = cs_position(N_STATIONS)
+for _ in range(N_GENERATIONS):
+    F_values = F(translateDNA(pop),DNA)    # compute function value by extracting DNA
+
+# GA part (evolution)
+fitness = get_fitness(F_values)
+print("Most fitted DNA: ", pop[np.argmin(fitness), :])
+pop = select(pop, fitness)
+pop_copy = pop.copy()
+for parent in pop:
+    child = crossover(parent, pop_copy)
+    child = mutate(child)
+    parent[:] = child       # parent is replaced by its child
