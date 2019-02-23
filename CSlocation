@@ -1,0 +1,21 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = pd.read_csv('F:\\BUPT\\EV-1\\allin.csv')             #Read the data in csv and store it in DataFrame
+m = [0,1,2,4,5,6,7,8,9]
+data_1 = data.drop(data.columns[m], axis=1, inplace=False)  #Remove irrelevant data
+data_2 = data_1[data_1['chargestate'].isin([1])]            #Extract data with a charge status equal to one
+data_3 = data_2.drop('chargestate', axis=1, inplace=False)
+
+plt.xlabel('lng')
+plt.ylabel('lat')
+x = data_3.pop('lng')
+y = data_3.pop('lat')
+plt.xlim(xmax=117.30,xmin=115.25)
+plt.ylim(ymax=41.03,ymin=39.26)
+#print(x)
+#print(y)
+
+plt.plot(x,y,'ro',markersize = 2.5)
+plt.show()
