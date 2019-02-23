@@ -1,0 +1,20 @@
+import numpy as np
+import pandas as pd
+
+data = pd.read_csv('F:\\BUPT\\EV-1\\L6T78Y4W0HN066438.csv') #Read the data in csv and store it in DataFrame
+m = [0,1,4,5,6,7,9]                                         #Apart from driving status, charging status, SOC, latitude and longitude
+data_1 = data.drop(data.columns[m], axis=1, inplace=False)
+data_2 = data_1[data_1['chargestate'].isin([3])] 
+data_3 = data_2[data_2['runstate'].isin([1])] 
+data_4 = data_3.drop(['chargestate','runstate'], axis=1, inplace=False)
+data_4.reset_index(drop=True, inplace=True)
+
+for indexs in data_4.index:
+    temp = np.array([data_4.loc[indexs].values[0],
+                    data_4.loc[indexs].values[1],
+                    data_4.loc[indexs].values[2]])
+    if temp[0]>30 or temp[0]<0 or temp[1]>117.30 or temp[1]<115.25 or temp[2]>41.03 or temp[2]<39.26:
+        data_4 = data_4.drop(indexs)                        #Filter data
+data_4.reset_index(drop=True, inplace=True)
+data_5 = data_4.drop(['soc'], axis=1, inplace=False)
+data_5.to_csv('data.csv')                                   #Write filtered data to a new csv
